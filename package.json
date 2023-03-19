@@ -1,5 +1,5 @@
 {
-  "name": "pet-support-back",
+  "name": "our-pets-back",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VVr17/pet-support-back.git"
+    "url": "git+https://github.com/AleksandrTatarenko/our-pets-back.git"
   },
-  "author": "VIRA VORONOVA",
+  "author": "Aleksandr Tatarenko",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/VVr17/pet-support-back/issues"
+    "url": "https://github.com/AleksandrTatarenko/our-pets-back/issues"
   },
-  "homepage": "https://github.com/VVr17/pet-support-back#readme",
+  "homepage": "https://github.com/AleksandrTatarenko/our-pets-back#readme",
   "dependencies": {
     "@joi/date": "^2.1.0",
     "bcrypt": "^5.1.0",
