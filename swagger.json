@@ -1,0 +1,975 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "2.0.2",
+    "title": "Pet-Support API with Swagger",
+    "description": "This is CRUD API application made with Express and documented with Swagger"
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    {
+      "url": "https://pet-support.up.railway.app"
+    },
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API for users in the system"
+    },
+    {
+      "name": "Notices",
+      "description": "API for notices in the system"
+    },
+    {
+      "name": "News",
+      "description": "API for news in the system"
+    },
+    {
+      "name": "Services",
+      "description": "API for services-sidebar in the system"
+    },
+    {
+      "name": "Pets",
+      "description": "API for pets in the system"
+    }
+  ],
+
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "Email already exist"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "Login object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User has been logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/auth/current": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get current user",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Current user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update current user",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "userImage",
+            "type": "file",
+            "description": "The file to upload."
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "User update",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current user has been updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "User logout",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "204": {
+            "description": "User has been logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/notices/user": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get authorized user notices ",
+        "security": [{ "Bearer": [] }],
+        "parameters": [],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Notices has been found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notices"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/notices/category/{categoryName}": {
+      "parameters": [
+        {
+          "name": "categoryName",
+          "in": "path",
+          "required": true,
+          "description": "Name of category that notices needs to be found ['sell', 'lost_found', 'in_good_hands']",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get authorized user notices ",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The number of page to set results",
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The numbers of items to return",
+            "type": "integer"
+          }
+        ],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Notices has been found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notices"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Post notice to chosen category by authorized user",
+        "security": [{ "Bearer": [] }],
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "petImage",
+            "in": "formData",
+            "description": "Image file to upload",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Notice object",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AddNoticeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notice has been added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/notices/id/{noticeId}": {
+      "parameters": [
+        {
+          "name": "noticeId",
+          "in": "path",
+          "required": true,
+          "description": "Notice Id to be found",
+          "type": "string",
+          "format": "ObjectId",
+          "example": "63f1feee746e0ba167d026f3"
+        }
+      ],
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get notice by Id",
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Notices by id has been found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Notices"],
+        "summary": "Delete notice completely by authorized user their own notice",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Notice has been deleted successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/notices/favorites/{noticeId}": {
+      "parameters": [
+        {
+          "name": "noticeId",
+          "in": "path",
+          "required": true,
+          "description": "Notice Id to be found",
+          "type": "string",
+          "format": "ObjectId"
+        }
+      ],
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Add notice to user's favorite",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Notice has been added to favorite"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Notices"],
+        "summary": "Delete notice from user's favorite",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Notice has been deleted successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/notices/favorites": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get user's favorite notices",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Favorite notices has been found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notices"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/news": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get news",
+        "parameters": [],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "News have been found successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/services": {
+      "get": {
+        "tags": ["Services"],
+        "summary": "Get services",
+        "parameters": [],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Services have been found successfully"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/pets": {
+      "post": {
+        "tags": ["Pets"],
+        "summary": "Add pet by authorized user",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "petImage",
+            "in": "formData",
+            "description": "Image file to upload",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Notice object",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pets has been added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/pets/{petId}": {
+      "parameters": [
+        {
+          "name": "petId",
+          "in": "path",
+          "required": true,
+          "description": "Pet Id to be found",
+          "type": "string",
+          "format": "ObjectId"
+        }
+      ],
+      "delete": {
+        "tags": ["Pets"],
+        "summary": "Delete pet by authorized user",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {},
+        "responses": {
+          "200": {
+            "description": "Pet has been deleted successfully"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "required": ["email", "password"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string",
+            "description": "User`s name",
+            "example": "FirstName LastName"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "User`s birthday",
+            "example": "12.06.1990"
+          },
+          "city": {
+            "type": "string",
+            "description": "User`s city, region",
+            "example": "Kyiv, Ukraine"
+          },
+          "phone": {
+            "type": "string",
+            "description": "User`s phone",
+            "example": "+380123456789"
+          },
+          "pets": {
+            "type": "array",
+            "description": "User's pets",
+            "example": "[pets]"
+          },
+          "favoriteNotices": {
+            "type": "array",
+            "description": "User's favorite notices",
+            "example": "[notices]"
+          }
+        }
+      },
+      "Users": {
+        "type": "array",
+        "$ref": "#/components/schemas/User"
+      },
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["email", "password", "name", "city", "phone"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email",
+            "example": "example@mail.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User`s password",
+            "example": "Password1"
+          },
+          "name": {
+            "type": "string",
+            "description": "User`s name",
+            "example": "FirstName LastName"
+          },
+          "city": {
+            "type": "string",
+            "description": "User`s city, region",
+            "example": "Kyiv, Ukraine"
+          },
+          "phone": {
+            "type": "string",
+            "description": "User`s phone",
+            "example": "+380123456789"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email",
+            "example": "example@mail.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User`s password",
+            "example": "Password1"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email",
+            "example": "example@mail.com"
+          },
+          "name": {
+            "type": "string",
+            "description": "User`s name",
+            "example": "FirstName LastName"
+          },
+          "city": {
+            "type": "string",
+            "description": "User`s city, region",
+            "example": "Kyiv, Ukraine"
+          },
+          "phone": {
+            "type": "string",
+            "description": "User`s phone",
+            "example": "+380123456789"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "User`s birthday",
+            "example": "12.06.1990"
+          },
+          "userImage": {
+            "type": "file",
+            "description": "file to download"
+          }
+        }
+      },
+      "Notice": {
+        "required": [
+          "title",
+          "photoURL",
+          "name",
+          "sex",
+          "birthDate",
+          "breed",
+          "location",
+          "comments",
+          "category"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "title": {
+            "type": "string",
+            "description": "notice title",
+            "example": "Dog for sell"
+          },
+          "photoURL": {
+            "type": "string",
+            "description": "URL photo",
+            "example": "https://cdn.pixabay.com/photo/2014/11/30/14/11/cat-551554_960_720.jpg"
+          },
+          "name": {
+            "type": "string",
+            "description": "Pet's name",
+            "example": "Bulbasavr"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pet's breed",
+            "example": "Husky"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Pet's sex ['male, 'female]",
+            "example": "male"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "12-06-2020"
+          },
+          "location": {
+            "type": "string",
+            "description": "City, region",
+            "example": "Kyiv, Ukraine"
+          },
+          "comments": {
+            "type": "string",
+            "description": "City, region",
+            "example": "This is a beautiful dog"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price for sell",
+            "example": "15"
+          },
+          "owner": {
+            "type": "string",
+            "description": "User's id",
+            "example": "63f0c4c6c11078905fe1a78d",
+            "format": "ObjectId"
+          },
+          "category": {
+            "type": "string",
+            "description": "Category ['sell', 'lost-found, 'in-good-hands]",
+            "example": "63f0c4c6c11078905fe1a78d"
+          }
+        }
+      },
+      "Notices": {
+        "type": "array",
+        "$ref": "#/components/schemas/Notice"
+      },
+      "AddNoticeRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "petImage",
+          "name",
+          "sex",
+          "birthDate",
+          "breed",
+          "location",
+          "comments",
+          "category"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "notice title",
+            "example": "Dog for sell"
+          },
+          "petImage": {
+            "type": "file",
+            "description": "file to download"
+          },
+          "name": {
+            "type": "string",
+            "description": "Pet's name",
+            "example": "Bulbasavr"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pet's breed",
+            "example": "Husky"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Pet's sex ['male, 'female]",
+            "example": "male"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "12-06-2020"
+          },
+          "location": {
+            "type": "string",
+            "description": "City, region",
+            "example": "Kyiv, Ukraine"
+          },
+          "comments": {
+            "type": "string",
+            "description": "City, region",
+            "example": "This is a beautiful dog"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price for sell",
+            "example": "15"
+          }
+        }
+      },
+      "Pet": {
+        "required": ["photoURL", "name", "birthDate", "breed", "comments"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "format": "ObjectId",
+            "uniqueItems": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Pet's name",
+            "example": "Bulbasavr"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pet's breed",
+            "example": "Husky"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "12-06-2020"
+          },
+          "photoURL": {
+            "type": "string",
+            "description": "URL photo",
+            "example": "https://cdn.pixabay.com/photo/2014/11/30/14/11/cat-551554_960_720.jpg"
+          },
+          "comments": {
+            "type": "string",
+            "description": "City, region",
+            "example": "This is a beautiful dog"
+          },
+          "owner": {
+            "type": "string",
+            "description": "User's id",
+            "example": "63f0c4c6c11078905fe1a78d",
+            "format": "ObjectId"
+          }
+        }
+      },
+      "Pets": { "type": "array", "$ref": "#/components/schemas/Pet" },
+      "AddPetRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "petImage",
+          "name",
+          "sex",
+          "birthDate",
+          "breed",
+          "location",
+          "comments",
+          "category"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Pet's name",
+            "example": "Bulbasavr"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pet's breed",
+            "example": "Husky"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "12-06-2020"
+          },
+          "petImage": {
+            "type": "file",
+            "description": "file to download"
+          },
+          "comments": {
+            "type": "string",
+            "description": "City, region",
+            "example": "This is a beautiful dog"
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
